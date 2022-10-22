@@ -16,7 +16,7 @@ class MovieDetailsViewController: UIViewController {
     @IBOutlet weak var titleLbl: UILabel!
     @IBOutlet weak var posterImageView: UIImageView!
     
-    var viewModel:MovieDetailsViewModel?
+    var viewModel: MovieDetailsViewModel?
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -34,7 +34,7 @@ class MovieDetailsViewController: UIViewController {
         titleLbl.text = viewModel.movie.title
         descLbl.text = viewModel.movie.overView
         reviewsLbl.text = "\(viewModel.movie.reviews)"
-        let url = URL(string:"\(EndPoint.imagesBaseUrl)\(viewModel.movie.poster)")
+        let url = URL(string: "\(EndPoint.imagesBaseUrl)\(viewModel.movie.poster)")
         posterImageView.kf.setImage(with: url)
     }
 

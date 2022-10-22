@@ -19,4 +19,3 @@ struct EndPoint {
 struct Path {
     static let movies = "search/movie/"
 }
-

@@ -16,7 +16,7 @@ class MoviesViewController: UIViewController {
     
     private var bindings = Set<AnyCancellable>()
     
-    let viewModel:MoviesViewModelType = MoviesViewModel(repository: MovieRepository())
+    let viewModel: MoviesViewModelType = MoviesViewModel(repository: MovieRepository())
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -31,7 +31,7 @@ class MoviesViewController: UIViewController {
     }
 
     private func bindViewModelState() {
-      let cancellable =  viewModel.stateBinding.sink { completion in
+      let cancellable =  viewModel.stateBinding.sink { _ in
             
         } receiveValue: { [weak self] launchState in
             DispatchQueue.main.async {
@@ -46,14 +46,16 @@ class MoviesViewController: UIViewController {
              .debounce(for: 0.5, scheduler: RunLoop.main)
              .removeDuplicates()
              .sink { [weak self] in
-                 let apiRequest = ApiRequest(baseUrl: EndPoint.baseUrl, path: Path.movies, params: ["query":$0, "api_key": "3215a185b25eb297a66e63d137fb994f"])
+                 let apiRequest = ApiRequest(baseUrl: EndPoint.baseUrl,
+                                             path: Path.movies,
+                                             params: ["query": $0, "api_key": "3215a185b25eb297a66e63d137fb994f"])
 
                  self?.viewModel.searchMovies(keyword: $0, apiRequest: apiRequest)
              }
              .store(in: &bindings)
     }
     
-    private func updateUI(state:ViewState) {
+    private func updateUI(state: ViewState) {
         switch state {
         case .none:
             tableView.isHidden = true
@@ -67,18 +69,18 @@ class MoviesViewController: UIViewController {
         case .error(let error):
             activityIndicator.stopAnimating()
             tableView.reloadData()
-            self.showAlert(message:error)
+            self.showAlert(message: error)
         }
     }
 }
 
-extension MoviesViewController:UITableViewDataSource {
+extension MoviesViewController: UITableViewDataSource {
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return viewModel.movieCount
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        guard let cell = tableView.dequeueReusableCell(withIdentifier:"MovieTableViewCell", for: indexPath) as? MovieTableViewCell else {
+        guard let cell = tableView.dequeueReusableCell(withIdentifier: "MovieTableViewCell", for: indexPath) as? MovieTableViewCell else {
             return UITableViewCell()
         }
         cell.delegate = self
@@ -87,20 +89,19 @@ extension MoviesViewController:UITableViewDataSource {
     }
 }
 
-
 extension MoviesViewController: UITableViewDelegate {
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         
         let movie = viewModel.movies[indexPath.row]
         let detailsViewModel = MovieDetailsViewModel(movie: movie)
-        if  let detailsVC = UIStoryboard.init(name:"Main", bundle:nil).instantiateViewController(withIdentifier:"MovieDetailsViewController") as? MovieDetailsViewController {
+        if  let detailsVC = UIStoryboard.init(name: "Main", bundle: nil)
+            .instantiateViewController(withIdentifier: "MovieDetailsViewController") as? MovieDetailsViewController {
             detailsVC.viewModel = detailsViewModel
             
             self.navigationController?.pushViewController(detailsVC, animated: true)
         }
     }
 }
-
 
 extension MoviesViewController: MovieCellDelegate {
     func favAction(isSelected: Bool, index: Int) {

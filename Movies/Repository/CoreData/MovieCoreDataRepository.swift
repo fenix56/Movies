@@ -10,21 +10,21 @@ import CoreData
 import Combine
 
 protocol MovieCoreDataRepositoryType {
-    func saveFavMovie(movie:Movie)
+    func saveFavMovie(movie: Movie)
     func fetchFavouriteMovies()-> Future<[Movie], ServiceError>
-    func fetchFavouriteMovie(movieId:Int, completion:@escaping (FavMovie?) -> ())
-    func removeFavMovie(movie:Movie)
+    func fetchFavouriteMovie(movieId: Int, completion: @escaping (FavMovie?) -> Void)
+    func removeFavMovie(movie: Movie)
 }
 
 class MovieCoreDataRepository: MovieCoreDataRepositoryType {
-    func saveFavMovie(movie:Movie) {
+    func saveFavMovie(movie: Movie) {
         
         let moc = CoreDataManager.shared.persistentContainer.viewContext
         fetchFavouriteMovie(movieId: movie.movieId) { favMovie in
             
             guard favMovie == nil else { return }
             
-            let favMovie = NSEntityDescription.insertNewObject(forEntityName:"FavMovie", into:moc) as? FavMovie
+            let favMovie = NSEntityDescription.insertNewObject(forEntityName: "FavMovie", into: moc) as? FavMovie
             favMovie?.movieId = Int64(movie.movieId)
             favMovie?.poster = movie.poster
             favMovie?.title = movie.title
@@ -38,46 +38,47 @@ class MovieCoreDataRepository: MovieCoreDataRepositoryType {
         return Future { promise in
             let moc = CoreDataManager.shared.persistentContainer.viewContext
 
-            let fr = FavMovie.fetchRequest()
+            let freq = FavMovie.fetchRequest()
             // Perform Fetch Request
             moc.perform {
                 // Execute Fetch Request
-                guard let  result = try? fr.execute() else {
+                guard let result = try? freq.execute() else {
                     return
                 }
-                let movies =  result.map{ Movie(movieId: Int($0.movieId) , title: $0.title ?? "", poster: $0.poster ?? "", reviews: Int($0.viewCount), overView: $0.overView ?? "", isFav: true)
+                let movies =  result.map {
+                    Movie(movieId: Int($0.movieId), title: $0.title ?? "", poster: $0.poster ?? "",
+                          reviews: Int($0.viewCount), overView: $0.overView ?? "", isFav: true)
                 }
                 promise(.success(movies))
             }
         }
     }
     
-    
-    func fetchFavouriteMovie(movieId:Int, completion:@escaping (FavMovie?) -> ()){
+    func fetchFavouriteMovie(movieId: Int, completion: @escaping (FavMovie?) -> Void) {
         let moc = CoreDataManager.shared.persistentContainer.viewContext
 
-        let fr = FavMovie.fetchRequest()
-        fr.predicate = NSPredicate(format: "movieId == %d", movieId)
+        let freq = FavMovie.fetchRequest()
+        freq.predicate = NSPredicate(format: "movieId == %d", movieId)
         // Perform Fetch Request
         moc.perform {
             // Execute Fetch Request
-            guard let  result = try? fr.execute() else {
+            guard let result = try? freq.execute() else {
                 return
             }
-            if result.count > 0 {
+            if !result.isEmpty {
                 completion(result.first)
-            }else {
+            } else {
                 completion(nil)
             }
         }
         
     }
     
-    func removeFavMovie(movie:Movie) {
+    func removeFavMovie(movie: Movie) {
         
         let moc = CoreDataManager.shared.persistentContainer.viewContext
 
-        fetchFavouriteMovie(movieId:movie.movieId) { favMovie in
+        fetchFavouriteMovie(movieId: movie.movieId) { favMovie in
             
             if let favMovie = favMovie {
                 moc.delete(favMovie)

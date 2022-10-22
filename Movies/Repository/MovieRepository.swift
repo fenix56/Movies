@@ -9,9 +9,9 @@ import Foundation
 import Combine
 
 protocol MovieRepositoryType {
-    func getMovies(apiRequest:ApiRequestType)->Future<[Movie], ServiceError>
+    func getMovies(apiRequest: ApiRequestType)->Future<[Movie], ServiceError>
     
-    func saveOrRemoveFav(movie:Movie)
+    func saveOrRemoveFav(movie: Movie)
     func fetchFavMovies()-> Future<[Movie], ServiceError>
 }
 
@@ -20,10 +20,10 @@ class MovieRepository: MovieRepositoryType {
     let networkManager: Networkable
     let movieCoreDataRepo: MovieCoreDataRepositoryType
 
-    var cancellables:Set<AnyCancellable?> = Set()
+    var cancellables: Set<AnyCancellable?> = Set()
 
-    init(networkManager:Networkable = NetworkManager(),
-         movieCoreDataRepo:MovieCoreDataRepositoryType = MovieCoreDataRepository()) {
+    init(networkManager: Networkable = NetworkManager(),
+         movieCoreDataRepo: MovieCoreDataRepositoryType = MovieCoreDataRepository()) {
         self.networkManager = networkManager
         self.movieCoreDataRepo = movieCoreDataRepo
     }
@@ -31,7 +31,6 @@ class MovieRepository: MovieRepositoryType {
     func getMovies(apiRequest: ApiRequestType) -> Future<[Movie], ServiceError> {
         return Future { [unowned self] promise in
 
-            
             let favMoviePublisher = movieCoreDataRepo.fetchFavouriteMovies()
             
             let apiCallPublisher =   self.networkManager.doApiCall(apiRequest: apiRequest)
@@ -49,9 +48,11 @@ class MovieRepository: MovieRepositoryType {
                     return promise(.failure(ServiceError.parsingError))
                 }
                 
-               let movies =  decodedResponse.results.map{ result in
-                   Movie(movieId: result.id, title: result.title ?? "", poster: result.posterPath ?? "", reviews:Int(result.voteAverage ?? 0) , overView: result.overview ?? "",
-                         isFav: favMovies.filter{ $0.movieId == result.id}.count > 0 ? true : false )
+                let movies =  decodedResponse.results.map { result in
+                    Movie(movieId: result.id, title: result.title ?? "",
+                          poster: result.posterPath ?? "", reviews: Int(result.voteAverage ?? 0),
+                          overView: result.overview ?? "",
+                          isFav: favMovies.filter { $0.movieId == result.id }.isEmpty ? false : true)
                 }
                 return promise(.success(movies))
             }
@@ -64,7 +65,7 @@ class MovieRepository: MovieRepositoryType {
     func saveOrRemoveFav(movie: Movie) {
         if movie.isFav {
             movieCoreDataRepo.saveFavMovie(movie: movie)
-        }else {
+        } else {
             movieCoreDataRepo.removeFavMovie(movie: movie)
         }
     }

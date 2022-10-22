@@ -17,36 +17,36 @@ enum ViewState: Equatable {
 
 protocol MoviesViewModelType {
     var stateBinding: Published<ViewState>.Publisher { get }
-    var movieCount:Int { get }
-    var movies:[Movie] { get }
-    func searchMovies(keyword: String, apiRequest:ApiRequest)
-    func markFavourite(isSelected:Bool, index:Int)
+    var movieCount: Int { get }
+    var movies: [Movie] { get }
+    func searchMovies(keyword: String, apiRequest: ApiRequest)
+    func markFavourite(isSelected: Bool, index: Int)
     func showFavouriteMovies()
 }
 
 final class MoviesViewModel: MoviesViewModelType {
     
-    var stateBinding: Published<ViewState>.Publisher{ $state }
+    var stateBinding: Published<ViewState>.Publisher { $state }
     
-    private let repository:MovieRepositoryType
-    private var cancellables:Set<AnyCancellable> = Set()
+    private let repository: MovieRepositoryType
+    private var cancellables: Set<AnyCancellable> = Set()
         
     @Published  var state: ViewState = .none
 
-    var movies:[Movie] = []
+    var movies: [Movie] = []
     
     var movieCount: Int {
         return movies.count
     }
     
-    init(repository:MovieRepositoryType) {
+    init(repository: MovieRepositoryType) {
         self.repository = repository
     }
 
-    func searchMovies(keyword: String, apiRequest:ApiRequest) {
-        if keyword.count > 0 {
+    func searchMovies(keyword: String, apiRequest: ApiRequest) {
+        if !keyword.isEmpty {
             getMovies(apiRequest: apiRequest)
-        }else {
+        } else {
             showFavouriteMovies()
         }
     }
@@ -60,7 +60,7 @@ final class MoviesViewModel: MoviesViewModelType {
             switch completion {
             case .finished:
                 break
-            case .failure(_):
+            case .failure:
                 self?.state = ViewState.error("Network Not Availale")
             }
         } receiveValue: { [weak self] movies in
@@ -79,7 +79,7 @@ final class MoviesViewModel: MoviesViewModelType {
     
     func showFavouriteMovies() {
         
-        let cancalable = repository.fetchFavMovies().sink { completion in
+        let cancalable = repository.fetchFavMovies().sink { _ in
             
         } receiveValue: { [weak self] movies in
             self?.movies = movies

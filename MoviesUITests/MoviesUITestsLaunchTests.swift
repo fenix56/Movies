@@ -16,6 +16,4 @@ class MoviesUITestsLaunchTests: XCTestCase {
     override func setUpWithError() throws {
         continueAfterFailure = false
     }
-
-  
 }

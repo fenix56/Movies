@@ -15,7 +15,7 @@ class Movie {
     let overView: String
     var isFav: Bool
     
-    init(movieId:Int, title:String, poster:String, reviews:Int, overView: String, isFav:Bool = false) {
+    init(movieId: Int, title: String, poster: String, reviews: Int, overView: String, isFav: Bool = false) {
         self.movieId = movieId
         self.title = title
         self.poster = poster

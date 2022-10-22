@@ -10,10 +10,10 @@ import XCTest
 
 class MoviesTests: XCTestCase {
     
-    var viewModel:MoviesViewModel!
-    var respository:MovieRepository!
-    var networkManager:MockNetworkManager!
-    var movieCoreDataRepo:MockMovieCoreDataRepository!
+    var viewModel: MoviesViewModel!
+    var respository: MovieRepository!
+    var networkManager: MockNetworkManager!
+    var movieCoreDataRepo: MockMovieCoreDataRepository!
     
     override func setUpWithError() throws {
         

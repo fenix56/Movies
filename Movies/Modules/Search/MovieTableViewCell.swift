@@ -9,7 +9,7 @@ import UIKit
 import Kingfisher
 
 protocol MovieCellDelegate: AnyObject {
-    func favAction(isSelected:Bool, index:Int)
+    func favAction(isSelected: Bool, index: Int)
 }
 
 class MovieTableViewCell: UITableViewCell {
@@ -19,7 +19,7 @@ class MovieTableViewCell: UITableViewCell {
     @IBOutlet weak var titleLbl: UILabel!
     @IBOutlet weak var posterImageView: UIImageView!
     
-    weak var delegate:MovieCellDelegate?
+    weak var delegate: MovieCellDelegate?
     
     override func awakeFromNib() {
         super.awakeFromNib()
@@ -37,15 +37,15 @@ class MovieTableViewCell: UITableViewCell {
         titleLbl.text = ""
         overViewLbl.text = ""
         reviewsCountLbl.text = ""
-        favButton.setImage(UIImage(named:"favourite_unselected"), for: .normal)
+        favButton.setImage(UIImage(named: "favourite_unselected"), for: .normal)
 
     }
 
-    func setData(movie:Movie, index:Int) {
+    func setData(movie: Movie, index: Int) {
         titleLbl.text = movie.title
         reviewsCountLbl.text = "Ratings : \(movie.reviews)"
         favButton.tag = index
-        let url = URL(string:"\(EndPoint.imagesBaseUrl)\(movie.poster)")
+        let url = URL(string: "\(EndPoint.imagesBaseUrl)\(movie.poster)")
         posterImageView.kf.setImage(with: url)
         
         overViewLbl.text = movie.overView
@@ -62,7 +62,7 @@ class MovieTableViewCell: UITableViewCell {
         let imageName = sender.isSelected ? "favourite_selected" : "favourite_unselected"
         sender.setImage(UIImage(named: imageName), for: .normal)
         
-        delegate?.favAction(isSelected:sender.isSelected, index: sender.tag)
+        delegate?.favAction(isSelected: sender.isSelected, index: sender.tag)
     }
     
 }
